@@ -1,4 +1,4 @@
-# AMM Mobile App (Flutter)
+# Nodus Protocol Mobile
 
 Cross-platform mobile application for interacting with the AMM Liquidity Pool smart contracts. Built with **Flutter/Dart** for iOS and Android.
 
@@ -25,7 +25,7 @@ Cross-platform mobile application for interacting with the AMM Liquidity Pool sm
 
 ## Overview
 
-The AMM Mobile App provides a clean, intuitive interface for users to:
+Nodus Protocol Mobile provides a clean, intuitive interface for users to:
 
 - Deposit tokens into liquidity pools
 - Remove liquidity and claim earned fees
@@ -307,7 +307,7 @@ class WalletService {
     if (!isInstalled) throw WalletNotInstalledException();
 
     // 2. Request connection
-    final accounts = await _subWallet.enable('AMM App');
+    final accounts = await _subWallet.enable('Nodus Protocol');
 
     // 3. Select default account
     _selectedAccount = accounts.first;
@@ -405,7 +405,7 @@ class CoreEngineService {
 
 ```dart
 class GraphQLClient {
-  final HttpLink _httpLink = HttpLink('https://api.amm.app/graphql');
+  final HttpLink _httpLink = HttpLink('https://api.nodusprotocol.io/graphql');
 
   Future<List<Pool>> fetchPools() async {
     final result = await _client.query(QueryOptions(
