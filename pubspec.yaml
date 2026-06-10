@@ -1,5 +1,5 @@
-name: amm_mobile_app
-description: AMM Liquidity Pool Mobile Application
+name: nodus_protocol
+description: Nodus Protocol — permissionless AMM DEX on Stellar Soroban
 publish_to: 'none'
 version: 1.0.0+1
 
