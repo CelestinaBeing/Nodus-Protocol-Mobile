@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../providers/transaction_provider.dart';
+import '../../providers/wallet_provider.dart';
+import '../../services/pool_service.dart';
 import '../../widgets/token_input.dart';
 import '../../widgets/transaction_button.dart';
 import 'estimated_lp_tokens.dart';
@@ -14,6 +18,7 @@ class RemoveLiquidityForm extends StatefulWidget {
 
 class _RemoveLiquidityFormState extends State<RemoveLiquidityForm> {
   final _lpController = TextEditingController();
+  final _service = PoolService();
   double _slippage = 0.5;
 
   @override
@@ -23,7 +28,46 @@ class _RemoveLiquidityFormState extends State<RemoveLiquidityForm> {
   }
 
   Future<void> _submit() async {
-    // Submit remove liquidity transaction
+    final wallet = context.read<WalletProvider>();
+    final txProvider = context.read<TransactionProvider>();
+
+    if (wallet.state != WalletState.connected || wallet.address == null) {
+      throw Exception('Please connect your wallet first');
+    }
+    final liquidity = double.tryParse(_lpController.text);
+    if (liquidity == null || liquidity <= 0) {
+      throw Exception('Enter a valid LP token amount');
+    }
+
+    final deadline =
+        (DateTime.now().millisecondsSinceEpoch ~/ 1000) + 300;
+
+    final unsignedTx = await _service.buildRemoveLiquidity({
+      'from': wallet.address,
+      'to': wallet.address,
+      'liquidity': liquidity.toStringAsFixed(7),
+      'amount_0_min': '0',
+      'amount_1_min': '0',
+      'deadline': deadline,
+    });
+
+    txProvider.add(TxRecord(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      description: 'Remove ${_lpController.text} LP tokens',
+      status: TxStatus.pending,
+      unsignedTx: unsignedTx,
+      createdAt: DateTime.now(),
+    ));
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Transaction built: ${unsignedTx.note}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      _lpController.clear();
+    }
   }
 
   @override
