@@ -1,5 +1,10 @@
 # Nodus Protocol Mobile
 
+[![CI](https://github.com/Nodus-protocol/Nodus-Protocol-Mobile/actions/workflows/ci.yml/badge.svg)](https://github.com/Nodus-protocol/Nodus-Protocol-Mobile/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](LICENSE)
+[![Flutter](https://img.shields.io/badge/Flutter-3.16+-02569B?logo=flutter)](pubspec.yaml)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 Cross-platform mobile application for interacting with the AMM Liquidity Pool smart contracts. Built with **Flutter/Dart** for iOS and Android.
 
 ---
