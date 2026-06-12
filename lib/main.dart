@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/wallet_provider.dart';
-import 'providers/pool_provider.dart';
-import 'providers/transaction_provider.dart';
 import 'screens/liquidity_screen.dart';
 import 'screens/swap_screen.dart';
 import 'screens/pool_overview_screen.dart';
@@ -23,8 +21,6 @@ class AMMobileApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WalletProvider()),
-        ChangeNotifierProvider(create: (_) => PoolProvider()),
-        ChangeNotifierProvider(create: (_) => TransactionProvider()),
       ],
       child: MaterialApp(
         title: 'AMM Mobile App',

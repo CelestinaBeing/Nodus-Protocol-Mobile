@@ -1,20 +1,30 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
+
+import '../models/auth_token.dart';
+import '../services/auth_service.dart';
 
 enum WalletState { disconnected, connecting, connected, error }
-
-const _kAddress = 'nodus_wallet_address';
 
 class WalletProvider extends ChangeNotifier {
   WalletState _state = WalletState.disconnected;
   String? _address;
+  String? _accessToken;
   String? _error;
   Map<String, double> _balances = {};
 
+  final AuthService _authService = AuthService();
+
   WalletState get state => _state;
   String? get address => _address;
+  String? get accessToken => _accessToken;
   String? get error => _error;
   Map<String, double> get balances => _balances;
+
+  static const _keyAddress = 'stellar_address';
+  static const _keyAccess = 'stellar_access_token';
+  static const _keyRefresh = 'stellar_refresh_token';
 
   WalletProvider() {
     _restoreSession();
@@ -22,38 +32,42 @@ class WalletProvider extends ChangeNotifier {
 
   Future<void> _restoreSession() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_kAddress);
-    if (saved != null) {
-      _address = saved;
+    final address = prefs.getString(_keyAddress);
+    final token = prefs.getString(_keyAccess);
+    if (address != null && token != null) {
+      _address = address;
+      _accessToken = token;
       _state = WalletState.connected;
       notifyListeners();
     }
   }
 
-  /// Connect by providing a Stellar public key (G...).
-  /// In production this would integrate with a mobile wallet SDK or
-  /// hardware wallet; for now it accepts the public key directly.
-  Future<void> connect({String? publicKey}) async {
+  /// Authenticates via SEP-10 using the provided Stellar secret key.
+  /// The secret key is used locally only to sign the challenge — it is never
+  /// transmitted to the server or stored on device.
+  Future<void> connect(String secretKey) async {
     _state = WalletState.connecting;
     _error = null;
     notifyListeners();
 
     try {
-      if (publicKey == null || publicKey.isEmpty) {
-        throw Exception('A Stellar public key is required');
-      }
-      if (!publicKey.startsWith('G') || publicKey.length != 56) {
-        throw Exception('Invalid Stellar public key');
-      }
+      final keypair = KeyPair.fromSecretSeed(secretKey);
+      final AuthToken token = await _authService.authenticateWithStellar(keypair);
 
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_kAddress, publicKey);
+      await prefs.setString(_keyAddress, keypair.accountId);
+      await prefs.setString(_keyAccess, token.accessToken);
+      await prefs.setString(_keyRefresh, token.refreshToken);
 
-      _address = publicKey;
-      _balances = {'XLM': 0, 'USDC': 0};
+      _address = keypair.accountId;
+      _accessToken = token.accessToken;
+      _balances = {'XLM': 0.0, 'USDC': 0.0};
       _state = WalletState.connected;
+    } on ArgumentError {
+      _error = 'Invalid secret key. Make sure you entered a valid Stellar secret key (starts with S).';
+      _state = WalletState.error;
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString().replaceFirst('Exception: ', '');
       _state = WalletState.error;
     }
 
@@ -62,9 +76,14 @@ class WalletProvider extends ChangeNotifier {
 
   Future<void> disconnect() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kAddress);
+    await prefs.remove(_keyAddress);
+    await prefs.remove(_keyAccess);
+    await prefs.remove(_keyRefresh);
+
     _address = null;
+    _accessToken = null;
     _balances = {};
+    _error = null;
     _state = WalletState.disconnected;
     notifyListeners();
   }

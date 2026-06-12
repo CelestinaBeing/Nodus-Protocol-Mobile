@@ -17,8 +17,8 @@ dependencies:
   graphql_flutter: ^5.1.2
   dio: ^5.4.0
   
-  # Wallet (Stellar)
-  stellar_flutter_sdk: ^1.8.0
+  # Stellar
+  stellar_flutter_sdk: ^1.8.1
   
   # Storage
   hive: ^2.2.3

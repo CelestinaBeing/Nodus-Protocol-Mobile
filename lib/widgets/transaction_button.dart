@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 
 class TransactionButton extends StatefulWidget {
   final String label;
+  final bool isLoading;
   final bool enabled;
-  final Future<void> Function() onSubmit;
+  final VoidCallback? onSubmit;
 
   const TransactionButton({
     super.key,
     required this.label,
-    this.enabled = true,
     required this.onSubmit,
+    this.isLoading = false,
+    this.enabled = true,
   });
 
   @override
@@ -17,44 +19,27 @@ class TransactionButton extends StatefulWidget {
 }
 
 class _TransactionButtonState extends State<TransactionButton> {
-  bool _loading = false;
-
-  Future<void> _handle() async {
-    setState(() => _loading = true);
-    try {
-      await widget.onSubmit();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final busy = widget.isLoading;
+
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: widget.enabled && !_loading ? _handle : null,
+        onPressed: widget.enabled && !busy ? widget.onSubmit : null,
         style: FilledButton.styleFrom(
           backgroundColor: cs.primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        child: _loading
+        child: busy
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white),
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
               )
-            : Text(widget.label,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            : Text(widget.label, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
     );
   }
