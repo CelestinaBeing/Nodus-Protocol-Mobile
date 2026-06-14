@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/pool_provider.dart';
-import '../widgets/pool_card.dart';
 import '../widgets/error_banner.dart';
 import '../widgets/loading_overlay.dart';
+import '../widgets/pool_card.dart';
 
 class PoolOverviewScreen extends StatefulWidget {
   const PoolOverviewScreen({super.key});

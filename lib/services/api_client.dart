@@ -5,11 +5,6 @@ const String _kAccessToken = 'nodus_access_token';
 const String _kRefreshToken = 'nodus_refresh_token';
 
 class ApiClient {
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:8080/api/v1',
-  );
-
   ApiClient()
       : dio = Dio(
           BaseOptions(
@@ -26,6 +21,11 @@ class ApiClient {
       ),
     );
   }
+
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:8080/api/v1',
+  );
 
   final Dio dio;
 
