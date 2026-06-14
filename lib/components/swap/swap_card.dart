@@ -74,7 +74,6 @@ class _SwapCardState extends State<SwapCard> {
       throw Exception('Enter an amount to get a quote');
     }
 
-    final amountIn = double.parse(_quote!.amountIn);
     final amountOut = double.parse(_quote!.amountOut);
     final minOut = amountOut * (1 - _slippage / 100);
     final deadline =

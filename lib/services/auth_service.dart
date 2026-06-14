@@ -48,7 +48,7 @@ class AuthService {
 
     AbstractTransaction tx;
     if (envelope.discriminant == XdrEnvelopeType.ENVELOPE_TYPE_TX) {
-      tx = Transaction.fromEnvelopeXdr(envelope);
+      tx = AbstractTransaction.fromEnvelopeXdr(envelope);
     } else {
       throw StateError('Unsupported transaction envelope type in SEP-10 challenge');
     }
