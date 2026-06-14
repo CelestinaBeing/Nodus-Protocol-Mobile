@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'providers/wallet_provider.dart';
 import 'screens/liquidity_screen.dart';
-import 'screens/swap_screen.dart';
 import 'screens/pool_overview_screen.dart';
+import 'screens/swap_screen.dart';
 import 'screens/wallet_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -27,7 +27,6 @@ class AMMobileApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
         home: const HomeScreen(),
       ),
     );

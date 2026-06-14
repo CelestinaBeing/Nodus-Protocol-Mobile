@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../models/token.dart';
 
 class TokenInput extends StatelessWidget {
-  final Token? token;
-  final TextEditingController controller;
-  final String? hintText;
-  final ValueChanged<String>? onChanged;
-
   const TokenInput({
     super.key,
     required this.token,
@@ -15,6 +11,11 @@ class TokenInput extends StatelessWidget {
     this.hintText,
     this.onChanged,
   });
+
+  final Token? token;
+  final TextEditingController controller;
+  final String? hintText;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {

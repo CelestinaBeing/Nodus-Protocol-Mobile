@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TransactionButton extends StatefulWidget {
-  final String label;
-  final bool isLoading;
-  final bool enabled;
-  final VoidCallback? onSubmit;
-
   const TransactionButton({
     super.key,
     required this.label,
@@ -13,6 +8,11 @@ class TransactionButton extends StatefulWidget {
     this.isLoading = false,
     this.enabled = true,
   });
+
+  final String label;
+  final bool isLoading;
+  final bool enabled;
+  final VoidCallback? onSubmit;
 
   @override
   State<TransactionButton> createState() => _TransactionButtonState();

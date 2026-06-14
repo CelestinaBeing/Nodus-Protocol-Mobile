@@ -1,11 +1,4 @@
 class PoolReserves {
-  final String reserve0;
-  final String reserve1;
-  final String token0;
-  final String token1;
-  final String lpTotalSupply;
-  final int timestampLast;
-
   const PoolReserves({
     required this.reserve0,
     required this.reserve1,
@@ -23,15 +16,16 @@ class PoolReserves {
         lpTotalSupply: json['lp_total_supply'] as String,
         timestampLast: (json['timestamp_last'] as num).toInt(),
       );
+
+  final String reserve0;
+  final String reserve1;
+  final String token0;
+  final String token1;
+  final String lpTotalSupply;
+  final int timestampLast;
 }
 
 class PoolStats {
-  final PoolReserves reserves;
-  final double priceToken0InToken1;
-  final double priceToken1InToken0;
-  final String kInvariant;
-  final int feeBps;
-
   const PoolStats({
     required this.reserves,
     required this.priceToken0InToken1,
@@ -51,20 +45,18 @@ class PoolStats {
         feeBps: (json['fee_bps'] as num).toInt(),
       );
 
+  final PoolReserves reserves;
+  final double priceToken0InToken1;
+  final double priceToken1InToken0;
+  final String kInvariant;
+  final int feeBps;
+
   double get feePercent => feeBps / 100;
 
   String get pairLabel => '${reserves.token0}/${reserves.token1}';
 }
 
 class PriceQuote {
-  final String amountIn;
-  final String amountOut;
-  final String tokenIn;
-  final String tokenOut;
-  final int feeBps;
-  final int priceImpactBps;
-  final double effectivePrice;
-
   const PriceQuote({
     required this.amountIn,
     required this.amountOut,
@@ -85,15 +77,18 @@ class PriceQuote {
         effectivePrice: (json['effective_price'] as num).toDouble(),
       );
 
+  final String amountIn;
+  final String amountOut;
+  final String tokenIn;
+  final String tokenOut;
+  final int feeBps;
+  final int priceImpactBps;
+  final double effectivePrice;
+
   double get priceImpactPercent => priceImpactBps / 100;
 }
 
 class UnsignedTx {
-  final String contractId;
-  final String function;
-  final dynamic args;
-  final String note;
-
   const UnsignedTx({
     required this.contractId,
     required this.function,
@@ -107,4 +102,9 @@ class UnsignedTx {
         args: json['args'],
         note: json['note'] as String,
       );
+
+  final String contractId;
+  final String function;
+  final dynamic args;
+  final String note;
 }

@@ -8,6 +8,14 @@ import '../services/auth_service.dart';
 enum WalletState { disconnected, connecting, connected, error }
 
 class WalletProvider extends ChangeNotifier {
+  WalletProvider() {
+    _restoreSession();
+  }
+
+  static const _keyAddress = 'stellar_address';
+  static const _keyAccess = 'stellar_access_token';
+  static const _keyRefresh = 'stellar_refresh_token';
+
   WalletState _state = WalletState.disconnected;
   String? _address;
   String? _accessToken;
@@ -21,14 +29,6 @@ class WalletProvider extends ChangeNotifier {
   String? get accessToken => _accessToken;
   String? get error => _error;
   Map<String, double> get balances => _balances;
-
-  static const _keyAddress = 'stellar_address';
-  static const _keyAccess = 'stellar_access_token';
-  static const _keyRefresh = 'stellar_refresh_token';
-
-  WalletProvider() {
-    _restoreSession();
-  }
 
   Future<void> _restoreSession() async {
     final prefs = await SharedPreferences.getInstance();

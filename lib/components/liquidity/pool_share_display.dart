@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../models/token.dart';
 import '../../providers/pool_provider.dart';
 
 class PoolShareDisplay extends StatelessWidget {
-  final Token? tokenA;
-  final Token? tokenB;
-  final double amountA;
-  final double amountB;
-
   const PoolShareDisplay({
     super.key,
     this.tokenA,
@@ -16,6 +12,11 @@ class PoolShareDisplay extends StatelessWidget {
     this.amountA = 0,
     this.amountB = 0,
   });
+
+  final Token? tokenA;
+  final Token? tokenB;
+  final double amountA;
+  final double amountB;
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +65,10 @@ class PoolShareDisplay extends StatelessWidget {
 }
 
 class _Row extends StatelessWidget {
+  const _Row({required this.label, required this.value});
+
   final String label;
   final String value;
-
-  const _Row({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

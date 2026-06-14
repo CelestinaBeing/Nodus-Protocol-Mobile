@@ -10,8 +10,6 @@ class ApiClient {
     defaultValue: 'http://localhost:8080/api/v1',
   );
 
-  final Dio dio;
-
   ApiClient()
       : dio = Dio(
           BaseOptions(
@@ -28,6 +26,8 @@ class ApiClient {
       ),
     );
   }
+
+  final Dio dio;
 
   Future<void> _attachToken(
     RequestOptions options,

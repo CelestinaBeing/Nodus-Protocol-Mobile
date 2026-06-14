@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../models/pool_stats.dart';
 
 class PoolCard extends StatelessWidget {
-  final PoolStats pool;
-
   const PoolCard({super.key, required this.pool});
+
+  final PoolStats pool;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +68,10 @@ class PoolCard extends StatelessWidget {
 }
 
 class _StatRow extends StatelessWidget {
+  const _StatRow({required this.label, required this.value});
+
   final String label;
   final String value;
-
-  const _StatRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {

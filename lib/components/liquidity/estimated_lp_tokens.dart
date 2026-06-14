@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../providers/pool_provider.dart';
 
 class EstimatedLpTokens extends StatelessWidget {
-  final double amountA;
-  final double amountB;
-  final double? lpAmount;
-  final bool isRemoving;
-
   const EstimatedLpTokens({
     super.key,
     this.amountA = 0,
@@ -15,6 +11,11 @@ class EstimatedLpTokens extends StatelessWidget {
     this.lpAmount,
     this.isRemoving = false,
   });
+
+  final double amountA;
+  final double amountB;
+  final double? lpAmount;
+  final bool isRemoving;
 
   @override
   Widget build(BuildContext context) {

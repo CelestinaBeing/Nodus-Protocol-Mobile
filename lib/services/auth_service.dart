@@ -14,9 +14,9 @@ const String _stellarNetwork = String.fromEnvironment(
 );
 
 class AuthService {
-  final Dio _dio;
-
   AuthService() : _dio = Dio(BaseOptions(baseUrl: _baseUrl));
+
+  final Dio _dio;
 
   /// Signs the SEP-10 challenge locally using the provided Stellar keypair
   /// and exchanges it for a JWT token pair.

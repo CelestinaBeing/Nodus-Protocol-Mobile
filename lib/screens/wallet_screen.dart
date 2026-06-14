@@ -53,12 +53,6 @@ class _WalletScreenState extends State<WalletScreen> {
 }
 
 class _ConnectView extends StatelessWidget {
-  final WalletProvider provider;
-  final TextEditingController controller;
-  final bool obscureKey;
-  final VoidCallback onToggleObscure;
-  final VoidCallback onConnect;
-
   const _ConnectView({
     required this.provider,
     required this.controller,
@@ -66,6 +60,12 @@ class _ConnectView extends StatelessWidget {
     required this.onToggleObscure,
     required this.onConnect,
   });
+
+  final WalletProvider provider;
+  final TextEditingController controller;
+  final bool obscureKey;
+  final VoidCallback onToggleObscure;
+  final VoidCallback onConnect;
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +132,9 @@ class _ConnectView extends StatelessWidget {
 }
 
 class _ConnectedView extends StatelessWidget {
-  final WalletProvider provider;
   const _ConnectedView({required this.provider});
+
+  final WalletProvider provider;
 
   String get _shortAddress {
     final addr = provider.address ?? '';

@@ -1,15 +1,10 @@
 import 'package:flutter/foundation.dart';
+
 import '../models/pool_stats.dart';
 
 enum TxStatus { pending, success, failed }
 
 class TxRecord {
-  final String id;
-  final String description;
-  final TxStatus status;
-  final UnsignedTx? unsignedTx;
-  final DateTime createdAt;
-
   const TxRecord({
     required this.id,
     required this.description,
@@ -17,6 +12,12 @@ class TxRecord {
     this.unsignedTx,
     required this.createdAt,
   });
+
+  final String id;
+  final String description;
+  final TxStatus status;
+  final UnsignedTx? unsignedTx;
+  final DateTime createdAt;
 
   TxRecord copyWith({TxStatus? status}) => TxRecord(
         id: id,
