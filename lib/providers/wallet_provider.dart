@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
@@ -13,8 +14,8 @@ class WalletProvider extends ChangeNotifier {
   }
 
   static const _keyAddress = 'stellar_address';
-  static const _keyAccess = 'stellar_access_token';
-  static const _keyRefresh = 'stellar_refresh_token';
+  static const _keyAccess = 'access_token';
+  static const _keyRefresh = 'refresh_token';
 
   WalletState _state = WalletState.disconnected;
   String? _address;
@@ -23,6 +24,14 @@ class WalletProvider extends ChangeNotifier {
   Map<String, double> _balances = {};
 
   final AuthService _authService = AuthService();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+  );
 
   WalletState get state => _state;
   String? get address => _address;
@@ -33,7 +42,8 @@ class WalletProvider extends ChangeNotifier {
   Future<void> _restoreSession() async {
     final prefs = await SharedPreferences.getInstance();
     final address = prefs.getString(_keyAddress);
-    final token = prefs.getString(_keyAccess);
+    final token = await _secureStorage.read(key: _keyAccess);
+    
     if (address != null && token != null) {
       _address = address;
       _accessToken = token;
@@ -54,10 +64,13 @@ class WalletProvider extends ChangeNotifier {
       final keypair = KeyPair.fromSecretSeed(secretKey);
       final AuthToken token = await _authService.authenticateWithStellar(keypair);
 
+      // Store address in SharedPreferences (non-sensitive)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_keyAddress, keypair.accountId);
-      await prefs.setString(_keyAccess, token.accessToken);
-      await prefs.setString(_keyRefresh, token.refreshToken);
+      
+      // Store tokens in secure storage (sensitive)
+      await _secureStorage.write(key: _keyAccess, value: token.accessToken);
+      await _secureStorage.write(key: _keyRefresh, value: token.refreshToken);
 
       _address = keypair.accountId;
       _accessToken = token.accessToken;
@@ -74,12 +87,27 @@ class WalletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Disconnects the wallet by:
+  /// 1. Calling backend logout to invalidate the JWT token
+  /// 2. Clearing secure storage (tokens)
+  /// 3. Clearing SharedPreferences (non-sensitive data)
+  /// 4. Resetting local state
   Future<void> disconnect() async {
+    // 1. Notify backend first (while we still have the token)
+    // This blacklists the JWT to prevent unauthorized access
+    if (_accessToken != null) {
+      await _authService.logout(_accessToken!);
+    }
+
+    // 2. Clear secure storage (tokens)
+    await _secureStorage.delete(key: _keyAccess);
+    await _secureStorage.delete(key: _keyRefresh);
+
+    // 3. Clear non-sensitive SharedPreferences  
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyAddress);
-    await prefs.remove(_keyAccess);
-    await prefs.remove(_keyRefresh);
 
+    // 4. Reset local state
     _address = null;
     _accessToken = null;
     _balances = {};
