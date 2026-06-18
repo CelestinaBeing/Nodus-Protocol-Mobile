@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:stellar_flutter_sdk/stellar_flutter_sdk.dart';
 
 import '../models/auth_token.dart';
@@ -41,6 +42,23 @@ class AuthService {
     );
     final tokens = tokenResponse.data['data']['tokens'] as Map<String, dynamic>;
     return AuthToken.fromJson(tokens);
+  }
+
+  /// Logs out the user by invalidating the access token on the backend.
+  /// This blacklists the JWT token to prevent its further use.
+  /// Even if the backend call fails, the local logout should proceed
+  /// to ensure the user can always disconnect from the app.
+  Future<void> logout(String accessToken) async {
+    try {
+      await _dio.post(
+        '/api/v1/auth/logout',
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
+      );
+    } catch (e) {
+      // Log the failure for monitoring but don't block local disconnect
+      // This ensures users can always logout locally even if backend is unreachable
+      debugPrint('[AuthService] Backend logout failed: $e');
+    }
   }
 
   String _signChallenge(String xdrBase64, KeyPair keypair, Network network) {

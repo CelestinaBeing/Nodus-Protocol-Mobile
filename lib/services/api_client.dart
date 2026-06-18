@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const String _kAccessToken = 'nodus_access_token';
-const String _kRefreshToken = 'nodus_refresh_token';
+const String _kAccessToken = 'access_token';
+const String _kRefreshToken = 'refresh_token';
 
 class ApiClient {
   ApiClient()
@@ -28,13 +28,21 @@ class ApiClient {
   );
 
   final Dio dio;
+  
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(
+      encryptedSharedPreferences: true,
+    ),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+  );
 
   Future<void> _attachToken(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString(_kAccessToken);
+    final token = await _secureStorage.read(key: _kAccessToken);
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -49,8 +57,7 @@ class ApiClient {
       handler.next(error);
       return;
     }
-    final prefs = await SharedPreferences.getInstance();
-    final refreshToken = prefs.getString(_kRefreshToken);
+    final refreshToken = await _secureStorage.read(key: _kRefreshToken);
     if (refreshToken == null) {
       handler.next(error);
       return;
@@ -62,35 +69,32 @@ class ApiClient {
         options: Options(headers: {}),
       );
       final tokens = resp.data['data']['tokens'] as Map<String, dynamic>;
-      await prefs.setString(_kAccessToken, tokens['access_token'] as String);
-      await prefs.setString(_kRefreshToken, tokens['refresh_token'] as String);
+      await _secureStorage.write(key: _kAccessToken, value: tokens['access_token'] as String);
+      await _secureStorage.write(key: _kRefreshToken, value: tokens['refresh_token'] as String);
 
       final opts = error.requestOptions;
       opts.headers['Authorization'] = 'Bearer ${tokens['access_token']}';
       final retried = await dio.fetch(opts);
       handler.resolve(retried);
     } catch (_) {
-      await prefs.remove(_kAccessToken);
-      await prefs.remove(_kRefreshToken);
+      await _secureStorage.delete(key: _kAccessToken);
+      await _secureStorage.delete(key: _kRefreshToken);
       handler.next(error);
     }
   }
 
   Future<void> saveTokens(String access, String refresh) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kAccessToken, access);
-    await prefs.setString(_kRefreshToken, refresh);
+    await _secureStorage.write(key: _kAccessToken, value: access);
+    await _secureStorage.write(key: _kRefreshToken, value: refresh);
   }
 
   Future<void> clearTokens() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kAccessToken);
-    await prefs.remove(_kRefreshToken);
+    await _secureStorage.delete(key: _kAccessToken);
+    await _secureStorage.delete(key: _kRefreshToken);
   }
 
   Future<String?> getAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_kAccessToken);
+    return await _secureStorage.read(key: _kAccessToken);
   }
 }
 
