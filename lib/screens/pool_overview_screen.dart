@@ -41,7 +41,10 @@ class _PoolOverviewScreenState extends State<PoolOverviewScreen> {
           }
 
           if (provider.error != null && provider.pools.isEmpty) {
-            return ErrorBanner(message: provider.error!);
+            return ErrorBanner(
+              message: provider.error!,
+              onRetry: provider.retry,
+            );
           }
 
           return RefreshIndicator(
