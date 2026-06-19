@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,38 +29,59 @@ class _SwapCardState extends State<SwapCard> {
   bool _loadingQuote = false;
   double _slippage = 0.5;
 
+  // Debounce timer to prevent API spam
+  Timer? _debounce;
+  static const _debounceDuration = Duration(milliseconds: 500);
+
   @override
   void dispose() {
     _amountController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
   Future<void> _onAmountChanged(String value) async {
+    // Cancel previous debounce timer
+    _debounce?.cancel();
+
     final amount = double.tryParse(value);
     if (amount == null || amount <= 0) {
       setState(() => _quote = null);
       return;
     }
 
+    // Set loading state immediately for UX feedback
     setState(() => _loadingQuote = true);
-    try {
-      final q = await context.read<PoolProvider>().getQuote(
-            amountIn: value,
-            tokenIn: _tokenIn.symbol,
-            tokenOut: _tokenOut.symbol,
-          );
-      setState(() => _quote = q);
-    } finally {
-      setState(() => _loadingQuote = false);
-    }
+
+    // Debounce: wait for user to stop typing before making API call
+    _debounce = Timer(_debounceDuration, () async {
+      try {
+        final q = await context.read<PoolProvider>().getQuote(
+              amountIn: value,
+              tokenIn: _tokenIn.symbol,
+              tokenOut: _tokenOut.symbol,
+            );
+        if (mounted) {
+          setState(() => _quote = q);
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _loadingQuote = false);
+        }
+      }
+    });
   }
 
   void _flipTokens() {
+    // Cancel any pending API calls
+    _debounce?.cancel();
+
     setState(() {
       final tmp = _tokenIn;
       _tokenIn = _tokenOut;
       _tokenOut = tmp;
       _quote = null;
+      _loadingQuote = false;
       _amountController.clear();
     });
   }
