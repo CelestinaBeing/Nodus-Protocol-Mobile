@@ -46,7 +46,10 @@ class _SwapCardState extends State<SwapCard> {
 
     final amount = double.tryParse(value);
     if (amount == null || amount <= 0) {
-      setState(() => _quote = null);
+      setState(() {
+        _quote = null;
+        _loadingQuote = false;
+      });
       return;
     }
 
@@ -55,6 +58,8 @@ class _SwapCardState extends State<SwapCard> {
 
     // Debounce: wait for user to stop typing before making API call
     _debounce = Timer(_debounceDuration, () async {
+      if (!mounted) return;
+      
       try {
         final q = await context.read<PoolProvider>().getQuote(
               amountIn: value,
@@ -62,11 +67,23 @@ class _SwapCardState extends State<SwapCard> {
               tokenOut: _tokenOut.symbol,
             );
         if (mounted) {
-          setState(() => _quote = q);
+          setState(() {
+            _quote = q;
+            _loadingQuote = false;
+          });
         }
-      } finally {
+      } catch (e) {
         if (mounted) {
-          setState(() => _loadingQuote = false);
+          setState(() {
+            _quote = null;
+            _loadingQuote = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to get quote: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       }
     });
