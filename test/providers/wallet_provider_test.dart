@@ -9,21 +9,21 @@ void main() {
   // FlutterSecureStorage uses a MethodChannel with no platform implementation
   // in the test environment. Mock it so _restoreSession() resolves to null
   // instead of throwing MissingPluginException after each test completes.
-  const _secureStorageChannel =
+  const secureStorageChannel =
       MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
 
   late WalletProvider provider;
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(_secureStorageChannel, (_) async => null);
+        .setMockMethodCallHandler(secureStorageChannel, (_) async => null);
     SharedPreferences.setMockInitialValues({});
     provider = WalletProvider();
   });
 
   tearDown(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(_secureStorageChannel, null);
+        .setMockMethodCallHandler(secureStorageChannel, null);
   });
 
   group('WalletProvider Tests - MOB-012 Fix', () {
