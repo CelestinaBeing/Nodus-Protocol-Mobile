@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/pool_stats.dart';
+import '../utils/formatters.dart';
 
 class PoolCard extends StatelessWidget {
   const PoolCard({super.key, required this.pool});
@@ -43,12 +44,14 @@ class PoolCard extends StatelessWidget {
             const SizedBox(height: 12),
             _StatRow(
               label: '${pool.reserves.token0} Reserve',
-              value: pool.reserves.reserve0,
+              value: formatReserve(
+                  pool.reserves.reserve0, pool.reserves.token0),
             ),
             const SizedBox(height: 4),
             _StatRow(
               label: '${pool.reserves.token1} Reserve',
-              value: pool.reserves.reserve1,
+              value: formatReserve(
+                  pool.reserves.reserve1, pool.reserves.token1),
             ),
             const SizedBox(height: 4),
             _StatRow(
@@ -58,7 +61,7 @@ class PoolCard extends StatelessWidget {
             const SizedBox(height: 4),
             _StatRow(
               label: 'LP Supply',
-              value: pool.reserves.lpTotalSupply,
+              value: compactNumber(pool.reserves.lpTotalSupply),
             ),
           ],
         ),
