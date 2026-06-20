@@ -3,6 +3,8 @@ import 'package:nodus_protocol/providers/wallet_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('WalletProvider Tests - MOB-012 Fix', () {
     late WalletProvider provider;
 

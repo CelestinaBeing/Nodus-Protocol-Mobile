@@ -79,6 +79,9 @@ class WalletProvider extends ChangeNotifier {
     } on ArgumentError {
       _error = 'Invalid secret key. Make sure you entered a valid Stellar secret key (starts with S).';
       _state = WalletState.error;
+    } on FormatException {
+      _error = 'Invalid secret key. Make sure you entered a valid Stellar secret key (starts with S).';
+      _state = WalletState.error;
     } catch (e) {
       _error = e.toString().replaceFirst('Exception: ', '');
       _state = WalletState.error;
