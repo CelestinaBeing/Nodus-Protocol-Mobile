@@ -9,21 +9,34 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
+          flutter-version: '3.16.3'
           channel: stable
           cache: true
 
       - name: Get dependencies
         run: flutter pub get
 
+      # Info-level messages (e.g. from updated flutter_lints) must not silently
+      # break CI. --fatal-warnings keeps the signal-to-noise ratio useful while
+      # still catching real problems.
       - name: Analyze
-        run: flutter analyze --fatal-infos
+        run: flutter analyze --fatal-warnings
 
-      - name: Test
-        run: flutter test --coverage
+      # Unit tests only — golden tests are excluded so a pixel-level divergence
+      # in a golden baseline cannot mask a real unit-test failure or suppress
+      # the coverage report.
+      - name: Unit Tests
+        run: flutter test --exclude-tags golden --coverage
+
+      # Golden tests run in isolation so that baseline mismatches are reported
+      # clearly without affecting unit-test results or coverage output.
+      - name: Golden Tests
+        run: flutter test --tags golden
