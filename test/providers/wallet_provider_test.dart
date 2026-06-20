@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nodus_protocol/providers/wallet_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -5,17 +6,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // FlutterSecureStorage uses a MethodChannel with no platform implementation
+  // in the test environment. Mock it so _restoreSession() resolves to null
+  // instead of throwing MissingPluginException after each test completes.
+  const _secureStorageChannel =
+      MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+
+  late WalletProvider provider;
+
+  setUp(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_secureStorageChannel, (_) async => null);
+    SharedPreferences.setMockInitialValues({});
+    provider = WalletProvider();
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_secureStorageChannel, null);
+  });
+
   group('WalletProvider Tests - MOB-012 Fix', () {
-    late WalletProvider provider;
-
-    setUp(() {
-      // Mock SharedPreferences
-      SharedPreferences.setMockInitialValues({});
-
-      // Create provider
-      provider = WalletProvider();
-    });
-
     group('disconnect() - Backend Logout Integration', () {
       test('should initialize in disconnected state', () {
         expect(provider.state, equals(WalletState.disconnected));
