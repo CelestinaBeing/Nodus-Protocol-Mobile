@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'retry_interceptor.dart';
+
 const String _kAccessToken = 'access_token';
 const String _kRefreshToken = 'refresh_token';
 
@@ -20,6 +22,10 @@ class ApiClient {
         onError: _refreshOnUnauthorized,
       ),
     );
+    // Retry transient failures (timeouts, connection errors, HTTP 5xx) with
+    // exponential backoff. Added after the auth wrapper so 401s are handled by
+    // the token-refresh logic and are never retried here.
+    dio.interceptors.add(RetryInterceptor(dio: dio));
   }
 
   static const String baseUrl = String.fromEnvironment(
