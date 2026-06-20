@@ -1,20 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:nodus_protocol/providers/wallet_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('WalletProvider Tests - MOB-012 Fix', () {
     late WalletProvider provider;
-    
-    const testAddress = 'GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
-    const testAccessToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...';
-    const testSecretKey = 'SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
 
     setUp(() {
       // Mock SharedPreferences
       SharedPreferences.setMockInitialValues({});
-      
+
       // Create provider
       provider = WalletProvider();
     });
@@ -50,7 +45,7 @@ void main() {
         // Arrange
         const shortKey = 'S123';
 
-        // Act  
+        // Act
         await provider.connect(shortKey);
 
         // Assert
@@ -64,7 +59,7 @@ void main() {
         expect(provider.state, equals(WalletState.disconnected));
         expect(provider.balances, isEmpty);
       });
-      
+
       test('should have proper state management', () {
         // Test that all required getters exist
         expect(provider.state, isA<WalletState>());
