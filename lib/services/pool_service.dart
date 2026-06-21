@@ -22,12 +22,27 @@ class PoolService {
     return PriceQuote.fromJson(resp.data['data'] as Map<String, dynamic>);
   }
 
-  Future<String> getLpBalance(String address) async {
+  Future<String> getLpBalance() async {
+    final resp = await _dio.get('/pool/lp-balance');
+    return resp.data['data']['lp_balance'] as String;
+  }
+
+  /// Public lookup for LP balance with address validation
+  /// Use only for legitimate public features (e.g., leaderboards)
+  Future<String> getPublicLpBalance(String address) async {
+    if (!_isValidStellarAddress(address)) {
+      throw ArgumentError('Invalid Stellar address');
+    }
     final resp = await _dio.get(
-      '/pool/lp-balance',
+      '/pool/lp-balance/public',
       queryParameters: {'address': address},
     );
     return resp.data['data']['lp_balance'] as String;
+  }
+
+  bool _isValidStellarAddress(String address) {
+    // Stellar addresses are 56-character base32-encoded strings starting with 'G'
+    return RegExp(r'^G[A-Z2-7]{55}$').hasMatch(address);
   }
 
   Future<PoolStats> getStats() async {
