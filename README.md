@@ -413,7 +413,7 @@ cd amm-mobile-app
 flutter pub get
 
 # Run code generation
-flutter pub run build_runner build
+make codegen
 ```
 
 ### Development
@@ -430,16 +430,20 @@ flutter run -d <device-id>
 
 ### Build Release
 
+You can use the automated build workflow which runs clean, pub get, codegen, and tests before building:
+
 ```bash
 # Android APK
-flutter build apk --release
+make build-apk
 
 # Android App Bundle
-flutter build appbundle --release
+make build-bundle
 
 # iOS
-flutter build ios --release
+make build-ios
 ```
+
+Or run the script directly: `bash scripts/build.sh [apk|bundle|ios]`
 
 ### Deploy
 
