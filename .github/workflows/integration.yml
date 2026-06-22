@@ -23,10 +23,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # Integration tests require compiling the app to a native Android target.
+      # stellar_flutter_sdk 1.8.1 and pinenacl 0.5.1 use Dart APIs
+      # (encodingForCharset, UnmodifiableUint8ListView) that were removed in
+      # Dart SDK >=3.5. Flutter 3.22.3 (Dart 3.4.x) is the highest stable
+      # release that still compiles these transitive dependencies successfully
+      # while also satisfying local_auth's >=3.16.6 constraint.
+      # Bump this pin when stellar_flutter_sdk / pinenacl ship Dart 3.5+ fixes.
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.2'
+          flutter-version: '3.22.3'
           channel: stable
           cache: true
 
