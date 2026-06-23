@@ -4,13 +4,15 @@ import 'package:nodus_protocol/providers/wallet_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  group('WalletProvider Tests - MOB-012 Fix', () {
-    late WalletProvider provider;
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    setUp(() {
-      SharedPreferences.setMockInitialValues({});
-      provider = WalletProvider();
-    });
+  // FlutterSecureStorage uses a MethodChannel with no platform implementation
+  // in the test environment. Mock it so _restoreSession() resolves to null
+  // instead of throwing MissingPluginException after each test completes.
+  const secureStorageChannel =
+      MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+
+  late WalletProvider provider;
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
