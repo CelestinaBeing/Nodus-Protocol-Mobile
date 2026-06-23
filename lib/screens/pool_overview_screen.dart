@@ -5,6 +5,7 @@ import '../providers/pool_provider.dart';
 import '../widgets/error_banner.dart';
 import '../widgets/loading_overlay.dart';
 import '../widgets/pool_card.dart';
+import 'pool_detail_screen.dart';
 
 class PoolOverviewScreen extends StatefulWidget {
   const PoolOverviewScreen({super.key});
@@ -54,7 +55,14 @@ class _PoolOverviewScreenState extends State<PoolOverviewScreen> {
               itemCount: provider.pools.length,
               itemBuilder: (context, index) {
                 final pool = provider.pools[index];
-                return PoolCard(pool: pool);
+                return PoolCard(
+                  pool: pool,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PoolDetailScreen(pool: pool),
+                    ),
+                  ),
+                );
               },
             ),
           );
