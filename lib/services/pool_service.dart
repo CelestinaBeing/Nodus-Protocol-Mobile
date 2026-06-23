@@ -1,8 +1,14 @@
+import 'package:dio/dio.dart';
+
 import '../models/pool_stats.dart';
 import 'api_client.dart';
 
 class PoolService {
-  final _dio = apiClient.dio;
+  /// Uses the shared [apiClient] Dio (which carries the retry + auth
+  /// interceptors) by default. A custom [dio] can be injected for testing.
+  PoolService({Dio? dio}) : _dio = dio ?? apiClient.dio;
+
+  final Dio _dio;
 
   Future<PoolReserves> getReserves() async {
     final resp = await _dio.get('/pool/reserves');
