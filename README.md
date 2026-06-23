@@ -18,7 +18,7 @@ Cross-platform mobile application for interacting with the AMM Liquidity Pool sm
 - [Screens](#screens)
 - [State Management](#state-management)
 - [Wallet Integration](#wallet-integration)
-- [Core Engine SDK](#core-engine-sdk)
+- [Core Engine Integration](#core-engine-integration)
 - [API & Caching](#api--caching)
 - [Build & Deploy](#build--deploy)
 - [Testing](#testing)
@@ -57,7 +57,7 @@ Nodus Protocol Mobile provides a clean, intuitive interface for users to:
 - Route preview
 
 ### Wallet Integration
-- Polkadot.js / SubWallet connection
+- Stellar SEP-10 connection
 - Transaction signing with biometric auth
 - Balance display across all tokens
 - Transaction history
@@ -106,7 +106,7 @@ amm-mobile-app/
 
     services/
        core_engine_service.dart      # Rust SDK FFI bridge
-       contract_service.dart         # ink! contract interaction
+       contract_service.dart         # Soroban contract interaction
        graphql_client.dart           # Backend API client
        cache_service.dart            # Local persistence
 
@@ -296,111 +296,45 @@ class PoolProvider extends ChangeNotifier {
 
 ## Wallet Integration
 
-### Supported Wallets
+Nodus Protocol Mobile uses **Stellar SEP-10** for wallet authentication. There is no browser extension — users provide their Stellar secret key directly on-device.
 
-- **SubWallet** (Primary)
-- **Polkadot.js** (Extension)
-- **Talisman** (Future)
+### Authentication Flow
 
-### Connection Flow
+1. User enters their Stellar secret key (`S...`, 56 characters)
+2. App derives the public key locally using `stellar_flutter_sdk`
+3. App fetches a SEP-10 challenge from the backend (`GET /auth/challenge?account=G...`)
+4. App signs the challenge transaction with the private key **on-device**
+5. App sends the signed envelope to the backend (`POST /auth/token`)
+6. Backend verifies the signature and issues a JWT access token
 
 ```dart
-class WalletService {
-  Future<void> connect() async {
-    // 1. Check if SubWallet is installed
-    final isInstalled = await _checkSubWallet();
-    if (!isInstalled) throw WalletNotInstalledException();
-
-    // 2. Request connection
-    final accounts = await _subWallet.enable('Nodus Protocol');
-
-    // 3. Select default account
-    _selectedAccount = accounts.first;
-
-    // 4. Subscribe to balance changes
-    _subscribeToBalance();
-  }
-
-  Future<String> signTransaction(Uint8List extrinsic) async {
-    return await _subWallet.signer.signPayload({
-      'address': _selectedAccount.address,
-      'data': extrinsic,
-    });
-  }
+// lib/screens/wallet_screen.dart (simplified)
+void _onConnect(WalletProvider provider) {
+  final key = _secretKeyController.text.trim();
+  if (key.isEmpty) return;
+  provider.connect(key);        // SEP-10 auth via stellar_flutter_sdk
+  _secretKeyController.clear(); // clear key from memory immediately
 }
 ```
 
-### Transaction Signing
+### Security Model
+- The secret key is never stored — it is used only to sign the SEP-10 challenge, then cleared
+- All transaction signing also happens on-device; the signed XDR envelope is sent to the backend, not the private key
+- JWTs are stored in `shared_preferences` (access token: 15 min TTL, refresh: 7 days)
 
-```dart
-class TransactionButton extends StatelessWidget {
-  final VoidCallback onSubmit;
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () async {
-        // Show biometric prompt
-        final authenticated = await _authenticate();
-        if (!authenticated) return;
-
-        // Sign and submit
-        onSubmit();
-      },
-      child: Text('Confirm Transaction'),
-    );
-  }
-}
+### Key Dependency
+```yaml
+dependencies:
+  stellar_flutter_sdk: ^1.8.1  # SEP-10, transaction building, key management
 ```
 
 ---
 
-## Core Engine SDK
+## Core Engine Integration
 
-The mobile app consumes the **Rust Core Engine** via FFI (Foreign Function Interface) for deterministic AMM math.
+The app communicates with the **Nodus Core Engine** (Rust/Axum REST API) for payment processing and swap execution. The Core Engine talks to the Stellar Soroban smart contract.
 
-```dart
-class CoreEngineService {
-  static final DynamicLibrary _lib = Platform.isAndroid
-      ? DynamicLibrary.open('libcore_engine.so')
-      : DynamicLibrary.process();
-
-  // Calculate swap output
-  static double calculateSwapOutput({
-    required double amountIn,
-    required double reserveIn,
-    required double reserveOut,
-    required double feeNumerator,
-    required double feeDenominator,
-  }) {
-    final func = _lib.lookupFunction<
-      SwapOutputNative,
-      SwapOutputDart
-    >('calculate_swap_output');
-
-    return func(amountIn, reserveIn, reserveOut, feeNumerator, feeDenominator);
-  }
-
-  // Calculate price impact
-  static double calculatePriceImpact({
-    required double amountIn,
-    required double reserveIn,
-    required double reserveOut,
-  }) {
-    final func = _lib.lookupFunction<
-      PriceImpactNative,
-      PriceImpactDart
-    >('calculate_price_impact');
-
-    return func(amountIn, reserveIn, reserveOut);
-  }
-}
-```
-
-**Benefits:**
-- Zero floating-point discrepancies between mobile and contract
-- Same math as on-chain (pure Rust)
-- Works offline for estimation
+No FFI / dynamic library is used — all interaction is via the backend REST API documented in the Backend README.
 
 ---
 
@@ -478,11 +412,8 @@ cd amm-mobile-app
 # Install dependencies
 flutter pub get
 
-# Build Core Engine FFI
-make build-ffi
-
 # Run code generation
-flutter pub run build_runner build
+make codegen
 ```
 
 ### Development
@@ -499,16 +430,20 @@ flutter run -d <device-id>
 
 ### Build Release
 
+You can use the automated build workflow which runs clean, pub get, codegen, and tests before building:
+
 ```bash
 # Android APK
-flutter build apk --release
+make build-apk
 
 # Android App Bundle
-flutter build appbundle --release
+make build-bundle
 
 # iOS
-flutter build ios --release
+make build-ios
 ```
+
+Or run the script directly: `bash scripts/build.sh [apk|bundle|ios]`
 
 ### Deploy
 
@@ -649,18 +584,15 @@ class AppTypography {
 
 ### Common Issues
 
-**Build fails with FFI errors:**
+**Build fails:**
 ```bash
-# Rebuild Core Engine
-make build-ffi
-
 # Clean and rebuild
 flutter clean
 flutter pub get
 ```
 
 **Wallet connection fails:**
-- Ensure SubWallet/Polkadot.js is installed
+- Ensure valid Stellar secret key is used
 - Check network matches (testnet vs mainnet)
 - Verify app has internet permission
 
@@ -697,6 +629,5 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 - [Flutter Documentation](https://docs.flutter.dev/)
 - [Dart Language](https://dart.dev/)
-- [Polkadot{.js} Extension](https://polkadot.js.org/extension/)
-- [SubWallet](https://subwallet.app/)
-- [ink! Documentation](https://use.ink/)
+- [Stellar Flutter SDK](https://github.com/Soneso/stellar_flutter_sdk)
+- [Soroban Documentation](https://soroban.stellar.org/)

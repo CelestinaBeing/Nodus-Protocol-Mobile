@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nodus_protocol/providers/wallet_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +12,19 @@ void main() {
       provider = WalletProvider();
     });
 
+  setUp(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(secureStorageChannel, (_) async => null);
+    SharedPreferences.setMockInitialValues({});
+    provider = WalletProvider();
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(secureStorageChannel, null);
+  });
+
+  group('WalletProvider Tests - MOB-012 Fix', () {
     group('disconnect() - Backend Logout Integration', () {
       test('should initialize in disconnected state', () {
         expect(provider.state, equals(WalletState.disconnected));

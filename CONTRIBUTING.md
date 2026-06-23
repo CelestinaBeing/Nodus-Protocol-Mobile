@@ -222,6 +222,8 @@ Each repo has its own language-specific standards, but these apply everywhere:
 - **No commented-out code** — Delete it; git history preserves it
 - **No TODO comments** — Open an issue instead
 - **Self-documenting names** — Avoid abbreviations and single-letter variables outside of loop indices
+- **Logging** — Use `debugPrint()` instead of `print()` in Flutter code. This is release-safe and prevents large string truncation.
+- **Return Types** — Always declare explicit return types for functions and methods. Our analyzer is configured with `always_declare_return_types: true`.
 
 Run the linter before every commit:
 
