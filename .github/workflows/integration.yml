@@ -37,19 +37,21 @@ jobs:
       - name: Generate Android platform
         run: flutter create . --platforms android
 
-      # biometric_storage 5.0.1 declares compileSdkVersion=31 in its own
-      # build.gradle, but its transitive AndroidX dependencies require
-      # compileSdk ≥ 34.  A Gradle init script placed in ~/.gradle/init.d/ is
-      # applied globally before any build task, overriding compileSdkVersion for
-      # all Android library subprojects without touching upstream plugin sources.
-      - name: Patch biometric_storage compileSdk
+      # Several plugins (biometric_storage 5.0.1, connectivity_plus 7.1.1)
+      # declare compileSdkVersion below what their transitive AndroidX deps
+      # and Java source require.  connectivity_plus 7.1.1 references
+      # VERSION_CODES.VANILLA_ICE_CREAM and TRANSPORT_SATELLITE which only
+      # exist at API 35 (Android 15).  biometric_storage needs at least 34.
+      # A Gradle init script in ~/.gradle/init.d/ is applied globally before
+      # any build task, overriding compileSdkVersion for all library subprojects.
+      - name: Patch plugin compileSdk
         run: |
           mkdir -p "${HOME}/.gradle/init.d"
           cat > "${HOME}/.gradle/init.d/override-compile-sdk.gradle" << 'GRADLE'
           allprojects {
               afterEvaluate {
                   if (plugins.hasPlugin('com.android.library')) {
-                      android.compileSdkVersion 34
+                      android.compileSdkVersion 35
                   }
               }
           }

@@ -18,8 +18,8 @@ void main() {
   group('Golden — PoolCard widget', () {
     testWidgets(
       'renders title and subtitle correctly',
-      skip: 'Baseline not yet generated — '
-          'run: flutter test --update-goldens --tags golden',
+      // ignore: avoid_redundant_argument_values
+      skip: true, // Baseline PNG not yet generated; run: flutter test --update-goldens --tags golden
       (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
@@ -50,8 +50,8 @@ void main() {
   group('Golden — Bottom navigation bar', () {
     testWidgets(
       'renders all four tabs',
-      skip: 'Baseline not yet generated — '
-          'run: flutter test --update-goldens --tags golden',
+      // ignore: avoid_redundant_argument_values
+      skip: true, // Baseline PNG not yet generated; run: flutter test --update-goldens --tags golden
       (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
