@@ -4,7 +4,7 @@ import 'package:nodus_protocol/utils/validation.dart';
 void main() {
   group('Validation.stellarSecretKey', () {
     test('valid 56-char S-key returns null', () {
-      const key = 'SCZANGBA5AKIA7ORYH4RO2EQVN3ISYIKXT6EU7EOSQ37NQBP5M4OBK3';
+      const key = 'SCZANGBA5AKIA7ORYH4RO2EQVN3ISYIKXT6EU7EOSQ37NQBP5M4OBK3A';
       expect(Validation.stellarSecretKey(key), isNull);
     });
 
@@ -25,14 +25,14 @@ void main() {
     });
 
     test('valid key with spaces trims and validates', () {
-      const key = ' SCZANGBA5AKIA7ORYH4RO2EQVN3ISYIKXT6EU7EOSQ37NQBP5M4OBK3 ';
+      const key = ' SCZANGBA5AKIA7ORYH4RO2EQVN3ISYIKXT6EU7EOSQ37NQBP5M4OBK3A ';
       expect(Validation.stellarSecretKey(key), isNull);
     });
   });
 
   group('Validation.stellarPublicKey', () {
     test('valid 56-char G-key returns null', () {
-      const key = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXJH';
+      const key = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXJH';
       expect(Validation.stellarPublicKey(key), isNull);
     });
 
