@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-06-24
+
+### Added
+- Version bumping script (`scripts/bump_version.sh`) for automated version management
+- Build number now properly tracked in `pubspec.yaml` (`version: X.Y.Z+BUILD`)
+
+### Changed
+- Updated version from `1.0.0+1` to `1.1.0+2` to establish version bumping convention
+
 ## [1.0.0] — 2026-01-01
 
 ### Added
