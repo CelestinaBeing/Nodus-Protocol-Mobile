@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/wallet_provider.dart';
+import '../utils/validation.dart';
 import '../widgets/transaction_button.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -24,9 +25,14 @@ class _WalletScreenState extends State<WalletScreen> {
 
   void _onConnect(WalletProvider provider) {
     final key = _secretKeyController.text.trim();
-    if (key.isEmpty) return;
+    final error = Validation.stellarSecretKey(key);
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: Colors.red),
+      );
+      return;
+    }
     provider.connect(key);
-    // Clear the field immediately so the key is not held in memory longer than needed
     _secretKeyController.clear();
   }
 
