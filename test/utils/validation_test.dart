@@ -21,7 +21,7 @@ void main() {
     });
 
     test('invalid base32 chars fail', () {
-      expect(Validation.stellarSecretKey('S' + '1' * 55), isNotNull);
+      expect(Validation.stellarSecretKey('S${'1' * 55}'), isNotNull);
     });
 
     test('valid key with spaces trims and validates', () {
