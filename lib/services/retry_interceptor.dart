@@ -36,19 +36,21 @@ class RetryInterceptor extends Interceptor {
   static const String _attemptKey = '_retry_attempt';
 
   /// Whether [err] represents a transient failure worth retrying.
-  static bool isRetryable(DioException err) => switch (err.type) {
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout ||
-        DioExceptionType.transformTimeout ||
-        DioExceptionType.connectionError =>
-          true,
-        DioExceptionType.badResponse => (err.response?.statusCode ?? 0) >= 500,
-        DioExceptionType.cancel ||
-        DioExceptionType.badCertificate ||
-        DioExceptionType.unknown =>
-          false,
-      };
+  static bool isRetryable(DioException err) {
+    switch (err.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+      case DioExceptionType.connectionError:
+        return true;
+      case DioExceptionType.badResponse:
+        return (err.response?.statusCode ?? 0) >= 500;
+      case DioExceptionType.cancel:
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.unknown:
+        return false;
+    }
+  }
 
   @override
   Future<void> onError(
