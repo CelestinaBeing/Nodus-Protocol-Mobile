@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nodus_protocol/models/pool_stats.dart';
 
 void main() {
-  const reservesJson = {
+  final reservesJson = <String, dynamic>{
     'reserve_0': '1000000',
     'reserve_1': '500000',
     'token_0': 'XLM',
@@ -11,7 +11,7 @@ void main() {
     'timestamp_last': 1700000000,
   };
 
-  const poolStatsJson = {
+  final poolStatsJson = <String, dynamic>{
     'reserves': reservesJson,
     'price_token0_in_token1': 0.5,
     'price_token1_in_token0': 2.0,
@@ -66,7 +66,7 @@ void main() {
   });
 
   group('PriceQuote.fromJson', () {
-    const quoteJson = {
+    final quoteJson = <String, dynamic>{
       'amount_in': '100000',
       'amount_out': '49850',
       'token_in': 'XLM',
@@ -110,7 +110,7 @@ void main() {
   });
 
   group('UnsignedTx.fromJson', () {
-    const txJson = {
+    final txJson = <String, dynamic>{
       'contract_id': 'CXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
       'function': 'swap',
       'args': ['100000', 'XLM', 'USDC'],
