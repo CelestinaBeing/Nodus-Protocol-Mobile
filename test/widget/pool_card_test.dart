@@ -9,19 +9,18 @@ import 'package:nodus_protocol/widgets/pool_card.dart';
 void main() {
   testWidgets('PoolCard renders correctly with mock data', (tester) async {
     final mockPool = PoolStats(
-      pairLabel: 'XLM/USDC',
-      contractId: 'CTEST123',
       reserves: PoolReserves(
         token0: 'XLM',
         token1: 'USDC',
         reserve0: '1000000',
         reserve1: '5000000',
         lpTotalSupply: '2236067',
+        timestampLast: 1640000000,
       ),
-      feePercent: 0.3,
-      volume24h: 125000.50,
-      tvl: 6000000.00,
-      apr: 12.5,
+      priceToken0InToken1: 0.2,
+      priceToken1InToken0: 5.0,
+      kInvariant: '5000000000000',
+      feeBps: 30,
     );
 
     await tester.pumpWidget(
@@ -41,19 +40,18 @@ void main() {
 
   testWidgets('PoolCard renders correctly in dark theme', (tester) async {
     final mockPool = PoolStats(
-      pairLabel: 'XLM/USDC',
-      contractId: 'CTEST123',
       reserves: PoolReserves(
         token0: 'XLM',
         token1: 'USDC',
         reserve0: '1000000',
         reserve1: '5000000',
         lpTotalSupply: '2236067',
+        timestampLast: 1640000000,
       ),
-      feePercent: 0.3,
-      volume24h: 125000.50,
-      tvl: 6000000.00,
-      apr: 12.5,
+      priceToken0InToken1: 0.2,
+      priceToken1InToken0: 5.0,
+      kInvariant: '5000000000000',
+      feeBps: 30,
     );
 
     await tester.pumpWidget(
