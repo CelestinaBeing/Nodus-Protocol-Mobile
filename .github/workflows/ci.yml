@@ -25,5 +25,8 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-warnings
 
-      - name: Test
-        run: flutter test --coverage
+      - name: Unit Tests
+        run: flutter test --exclude-tags golden --coverage
+
+      - name: Golden Tests
+        run: flutter test --tags golden
