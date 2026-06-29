@@ -1,9 +1,11 @@
+@Tags(['golden'])
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nodus_protocol/models/pool_stats.dart';
 import 'package:nodus_protocol/widgets/pool_card.dart';
 
-@Tags(['golden'])
 void main() {
   testWidgets('PoolCard renders correctly with mock data', (tester) async {
     const mockPool = PoolStats(
