@@ -24,7 +24,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData.light(),
-        home: Scaffold(
+        home: const Scaffold(
           body: PoolCard(pool: mockPool),
         ),
       ),
@@ -55,7 +55,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: ThemeData.dark(),
-        home: Scaffold(
+        home: const Scaffold(
           body: PoolCard(pool: mockPool),
         ),
       ),
