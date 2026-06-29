@@ -128,13 +128,17 @@ void main() {
       }
     });
 
-    test('does NOT retry cancellation or certificate errors', () {
+    test('does NOT retry cancellation, certificate errors, or transform timeouts', () {
       expect(
         RetryInterceptor.isRetryable(error(DioExceptionType.cancel)),
         isFalse,
       );
       expect(
         RetryInterceptor.isRetryable(error(DioExceptionType.badCertificate)),
+        isFalse,
+      );
+      expect(
+        RetryInterceptor.isRetryable(error(DioExceptionType.transformTimeout)),
         isFalse,
       );
     });
